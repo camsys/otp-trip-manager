@@ -10,13 +10,13 @@ class TripPlanner
   
   include ServiceAdapters::RideshareAdapter
 
-  def get_fixed_itineraries(from, to, trip_datetime, arriveBy, mode="TRANSIT,WALK", wheelchair="false", walk_speed=3.0, max_walk_distance=2, max_bicycle_distance=5, optimize='QUICK', num_itineraries = 3, min_transfer_time=nil, try_count=Oneclick::Application.config.OTP_retry_count)
+  def get_fixed_itineraries(from, to, trip_datetime, arriveBy, mode="TRANSIT,WALK", wheelchair="false", walk_speed=3.0, max_walk_distance=2, max_bicycle_distance=5, optimize='QUICK', num_itineraries = 3, min_transfer_time=nil, max_transfer_time=nil, try_count=Oneclick::Application.config.OTP_retry_count)
     try = 1
     result = nil
     response = nil
 
     while try <= try_count
-      result, response = get_fixed_itineraries_once(from, to, trip_datetime, arriveBy, mode, wheelchair, walk_speed, max_walk_distance, max_bicycle_distance, optimize, num_itineraries, min_transfer_time)
+      result, response = get_fixed_itineraries_once(from, to, trip_datetime, arriveBy, mode, wheelchair, walk_speed, max_walk_distance, max_bicycle_distance, optimize, num_itineraries, min_transfer_time, max_transfer_time)
       if result
         break
       else
@@ -34,7 +34,7 @@ class TripPlanner
 
   end
 
-  def get_fixed_itineraries_once(from, to, trip_datetime, arriveBy, mode="TRANSIT,WALK", wheelchair="false", walk_speed=3.0, max_walk_distance=2, max_bicycle_distance=5, optimize='QUICK', num_itineraries=3, min_transfer_time=nil)
+  def get_fixed_itineraries_once(from, to, trip_datetime, arriveBy, mode="TRANSIT,WALK", wheelchair="false", walk_speed=3.0, max_walk_distance=2, max_bicycle_distance=5, optimize='QUICK', num_itineraries=3, min_transfer_time=nil, max_transfer_time=nil)
     #walk_speed is defined in MPH and converted to m/s before going to OTP
     #max_walk_distance is defined in miles and converted to meters before going to OTP
 
@@ -52,6 +52,10 @@ class TripPlanner
     
     unless min_transfer_time.nil? 
       url_options += "&minTransferTime=" + min_transfer_time.to_s
+    end
+
+    unless max_transfer_time.nil? 
+      url_options += "&maxTransferTime=" + max_transfer_time.to_s
     end
 
     #If it's a bicycle trip, OTP uses walk distance as the bicycle distance

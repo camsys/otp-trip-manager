@@ -40,7 +40,8 @@ module Api
         max_bike_miles = params[:max_bicycle_miles] # Miles
         max_walk_seconds = params[:max_walk_seconds] # Seconds
         walk_mph = params[:walk_mph] || (@traveler.walking_speed ? @traveler.walking_speed.value : 3.0)
-        min_transfer_time = params[:min_transfer_time]
+        min_transfer_time_seconds = params[:min_transfer_time].to_i
+        max_transfer_time_seconds = params[:max_transfer_time].to_i
 
         #Assign Meta Data
         trip = Trip.new
@@ -57,7 +58,8 @@ module Api
         trip.walk_mph = walk_mph
         trip.max_bike_miles = max_bike_miles
         trip.num_itineraries = (params[:num_itineraries] || 3).to_i
-        trip.min_transfer_time = min_transfer_time
+        trip.min_transfer_time = min_transfer_time_seconds > 0 ? min_transfer_time_seconds : 360
+        trip.max_transfer_time = max_transfer_time_seconds > 0 ? max_transfer_time_seconds : 1800
         trip.save
 
         #Build the Trip Places
