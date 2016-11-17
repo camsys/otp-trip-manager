@@ -343,7 +343,7 @@ module CsHelpers
       asset_path = itinerary.mode.logo_url
     end
 
-    return asset_path
+    return ActionController::Base.helpers.asset_path(asset_path)
   end
 
   # logos are stored in local file system under dev environment
