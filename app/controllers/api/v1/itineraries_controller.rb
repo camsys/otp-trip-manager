@@ -75,7 +75,7 @@ module Api
         trip.max_transfer_time = max_transfer_time.nil? ? nil : max_transfer_time.to_i
         trip.source_tag = source_tag
         puts "trip.save"
-        #benchmark { trip.save }
+        benchmark { trip.save }
 
         #Build the Trip Places
         from_trip_place = TripPlace.new
@@ -157,7 +157,7 @@ module Api
             trip.scheduled_date = tp.scheduled_date
             trip.scheduled_time = tp.scheduled_time
             puts "trip.save (2)"
-            benchmark { trip.save }
+            #benchmark { trip.save }
           end
 
 
@@ -170,12 +170,12 @@ module Api
           puts 'Creating Itineraries'
 
           start = Time.now
-          otp_response = tp.create_itineraries
+          itins, otp_response = tp.create_itineraries
           puts 'Create Itineraries #######################################################################################################'
           puts Time.now - start
 
-          my_itins = nil
-          benchmark { my_itins = Itinerary.where(trip_part: tp).order('created_at') }
+          my_itins = itins
+          #benchmark { my_itins = Itinerary.where(trip_part: tp).order('created_at') }
           #my_itins = tp.itineraries
 
           Rails.logger.info('Trip part ' + tp.id.to_s + ' generated ' + tp.itineraries.count.to_s + ' itineraries')
@@ -183,14 +183,14 @@ module Api
           #Append data for API
           itins_loop_start = Time.now
           my_itins.each do |itinerary|
+            puts itinerary.ai
             i_hash = itinerary.as_json(except: 'legs')
             mode = itinerary.mode
             i_hash[:mode] = {name: TranslationEngine.translate_text(mode.name), code: mode.code}
-            i_hash[:segment_index] = itinerary.trip_part.sequence
-            i_hash[:start_location] = itinerary.trip_part.trip.origin.build_place_details_hash
-            i_hash[:end_location] = itinerary.trip_part.trip.destination.build_place_details_hash
+            i_hash[:segment_index] = tp.sequence
+            i_hash[:start_location] = trip.origin.build_place_details_hash
+            i_hash[:end_location] = trip.destination.build_place_details_hash
             i_hash[:prebooking_questions] = itinerary.prebooking_questions
-            i_hash[:bookable] = itinerary.is_bookable?
             if itinerary.service
               i_hash[:service_name] = itinerary.service.name
             else

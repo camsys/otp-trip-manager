@@ -228,8 +228,8 @@ class TripPart < ActiveRecord::Base
     end
     Rails.logger.info('Adding NEW ITINERARIES TO THIS TRIP PART')
     Rails.logger.info(itins.inspect)
-    self.itineraries << itins
-    return response
+    #self.itineraries << itins
+    return itins, response
   end
 
   def check_for_duplicates(new_i, existing_itins)
