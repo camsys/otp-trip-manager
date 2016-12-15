@@ -227,10 +227,10 @@ module Api
                   end
                   stop_times = trip_time['stopTimes']
                   puts stop_times.first['realtimeState']
-                  #if stop_times.first and stop_times.first['realtimeState'] == 'SCHEDULED'
-                  #  break
-                  #end
-                  puts '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+                  if stop_times.first and stop_times.first['realtimeState'] == 'SCHEDULED'
+                    break
+                  end
+                  start_updating = Time.now
 
                   leg['intermediateStops'].each do |stop|
                     stop_time = stop_times.detect{|hash| hash['stopId'] == stop['stopId']}
@@ -242,6 +242,9 @@ module Api
                     stop['TESTTEST'] = "TEST"
 
                   end
+
+                  puts "Updating Realtime for Intermediate Stops ###"
+                  puts Time.now - start_updating
 
                 end
 
