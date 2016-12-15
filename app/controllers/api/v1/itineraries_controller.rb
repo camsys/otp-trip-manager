@@ -239,8 +239,6 @@ module Api
                     stop['arrivalDelay'] = stop_time['arrivalDelay']
                     stop['departureDelay'] = stop_time['departureDelay']
                     stop['realtime'] = stop_time['realtime']
-                    stop['TESTTEST'] = "TEST"
-
                   end
 
                   puts "Updating Realtime for Intermediate Stops ###"
