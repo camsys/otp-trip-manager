@@ -229,9 +229,9 @@ module Api
                   end
                   stop_times = trip_time['stopTimes']
                   puts stop_times.first['realtimeState']
-                  if stop_times.first and stop_times.first['realtimeState'] == 'SCHEDULED'
-                    break
-                  end
+                  #if stop_times.first and stop_times.first['realtimeState'] == 'SCHEDULED'
+                  #  break
+                  #end
                   start_updating = Time.now
 
                   leg['intermediateStops'].each do |stop|
