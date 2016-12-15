@@ -208,7 +208,7 @@ class TripPart < ActiveRecord::Base
           # Transit modes + Bike, Drive, Walk
           timed "fixed" do
             start = Time.now
-            new_itins, response = create_fixed_route_itineraries({otp_mode: mode.otp_mode, mode: mode.code, walk_mph: params[:walk_mph], max_walk_miles: params[:max_walk_miles], max_walk_seconds: params[:max_walk_seconds], optimize: params[:optimize], num_itineraries: params[:num_itineraries], min_transfer_time: params[:min_transfer_time], max_transfer_time: params[:max_transfer_time], banned_routes: params[:banned_routes], preferred_routes: params[:preferred_routes]})
+            new_itins, response = create_fixed_route_itineraries({otp_mode: mode.otp_mode, mode: mode.code, walk_mph: params[:walk_speed], max_walk_miles: params[:max_walk_miles], max_walk_seconds: params[:max_walk_seconds], optimize: params[:optimize], num_itineraries: params[:num_itineraries], min_transfer_time: params[:min_transfer_time], max_transfer_time: params[:max_transfer_time], banned_routes: params[:banned_routes], preferred_routes: params[:preferred_routes]})
 
             puts 'CREATE FIXED_ ROUTE ITINERARIES ###'
             puts Time.now - start
