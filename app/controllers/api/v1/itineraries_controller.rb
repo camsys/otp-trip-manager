@@ -220,8 +220,17 @@ module Api
                 #3 Check to see if real-time is available for node stops
                 unless leg['intermediateStops'].blank?
 
+                  puts '###############################################################################'
 
                   trip_time = tp.get_trip_time leg['tripId'], otp_response
+
+
+                  puts 'TRIP TIME'
+                  puts trip_time.ai
+
+                  puts 'OTP_RESPONSE'
+                  puts otp_response.ai
+
                   if trip_time.blank?
                     break
                   end
