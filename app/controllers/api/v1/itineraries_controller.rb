@@ -175,6 +175,7 @@ module Api
 
           start = Time.now
           itins, otp_response = tp.create_itineraries({modes: trip.desired_modes, walk_speed: walk_mph, max_walk_miles: max_walk_miles, max_walk_seconds: max_walk_seconds, optimize: optimize, num_itineraries: trip.num_itineraries, min_transfer_time: min_transfer_time, max_transfer_time: max_transfer_time, banned_routes: banned_routes_string, preferred_routes: preferred_routes_string})
+
           puts 'Create Itineraries ###'
           puts Time.now - start
 
@@ -215,11 +216,21 @@ module Api
                   leg['specialService'] = leg['routeType'].in? specials
                 end
 
+
                 #3 Check to see if real-time is available for node stops
                 unless leg['intermediateStops'].blank?
+
+
                   trip_time = tp.get_trip_time leg['tripId'], otp_response
                   unless trip_time.blank?
+
+                    puts '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
                     stop_times = trip_time['stopTimes']
+                    if stop_times.first and stop_times.first['realtimeState'] == 'SCHEDULED'
+                      break
+                    end
+                    puts '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+
                     leg['intermediateStops'].each do |stop|
                       stop_time = stop_times.detect{|hash| hash['stopId'] == stop['stopId']}
                       stop['realtimeArrival'] = stop_time['realtimeArrival']
@@ -227,10 +238,12 @@ module Api
                       stop['arrivalDelay'] = stop_time['arrivalDelay']
                       stop['departureDelay'] = stop_time['departureDelay']
                       stop['realtime'] = stop_time['realtime']
+                      stop['TESTTEST'] = "TEST"
 
                     end
                   end
                 end
+
 
                 #4 If a location is a ParkNRide Denote it
                 if leg['mode'] == 'CAR' and itinerary.returned_mode_code == Mode.park_transit.code

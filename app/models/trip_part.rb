@@ -209,6 +209,10 @@ class TripPart < ActiveRecord::Base
           timed "fixed" do
             start = Time.now
             new_itins, response = create_fixed_route_itineraries({otp_mode: mode.otp_mode, mode: mode.code, walk_mph: params[:walk_mph], max_walk_miles: params[:max_walk_miles], max_walk_seconds: params[:max_walk_seconds], optimize: params[:optimize], num_itineraries: params[:num_itineraries], min_transfer_time: params[:min_transfer_time], max_transfer_time: params[:max_transfer_time], banned_routes: params[:banned_routes], preferred_routes: params[:preferred_routes]})
+
+            puts '**************************************************************'
+            puts response
+
             puts 'CREATE FIXED_ ROUTE ITINERARIES ###'
             puts Time.now - start
             non_duplicate_itins = []
@@ -300,8 +304,11 @@ class TripPart < ActiveRecord::Base
 
     start = Time.now
 
+    puts 'PARAMS[:MODE'
+    puts params[:mode]
+
     #If this is a transit trip, save the response
-    if params[:mode].to_s == "mode_transit_name"
+    if params[:mode].to_s == "mode_transit"
       transit_response = response
       #puts 'Saving trip part'
       #benchmark { self.save }
