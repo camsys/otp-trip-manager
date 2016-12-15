@@ -136,7 +136,9 @@ module Api
             tp.banned_routes = banned_routes_string
           end
 
+
           #Set Preferred Routes
+          preferred_routes_string = ""
           unless preferred_routes.blank?
             preferred_routes_string = ""
             preferred_routes.each do |preferred_route|
@@ -147,7 +149,8 @@ module Api
               end
 
             end
-            tp.preferred_routes = preferred_routes_string.chop
+            preferred_routes_string = preferred_routes_string.chop
+            tp.preferred_routes = preferred_routes_string
           end
 
           #Save Trip Part
@@ -172,7 +175,7 @@ module Api
           puts 'Creating Itineraries'
 
           start = Time.now
-          itins, otp_response = tp.create_itineraries({modes: trip.desired_modes, walk_speed: walk_mph, max_walk_miles: max_walk_miles, max_walk_seconds: max_walk_seconds, optimize: optimize, num_itineraries: trip.num_itineraries, min_transfer_time: min_transfer_time, max_transfer_time: max_transfer_time, banned_routes: banned_routes_string, preferred_routes: preferred_routes})
+          itins, otp_response = tp.create_itineraries({modes: trip.desired_modes, walk_speed: walk_mph, max_walk_miles: max_walk_miles, max_walk_seconds: max_walk_seconds, optimize: optimize, num_itineraries: trip.num_itineraries, min_transfer_time: min_transfer_time, max_transfer_time: max_transfer_time, banned_routes: banned_routes_string, preferred_routes: preferred_routes_string})
           puts 'Create Itineraries ###'
           puts Time.now - start
 
