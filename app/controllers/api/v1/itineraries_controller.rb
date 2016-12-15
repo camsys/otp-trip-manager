@@ -183,14 +183,12 @@ module Api
           #Append data for API
           itins_loop_start = Time.now
           my_itins.each do |itinerary|
-            puts itinerary.ai
             i_hash = itinerary.as_json(except: 'legs')
             mode = itinerary.mode
             i_hash[:mode] = {name: TranslationEngine.translate_text(mode.name), code: mode.code}
             i_hash[:segment_index] = tp.sequence
             i_hash[:start_location] = from_trip_place.build_place_details_hash
             i_hash[:end_location] = to_trip_place.build_place_details_hash
-            i_hash[:prebooking_questions] = itinerary.prebooking_questions
 
             #Open up the legs returned by OTP and augment the information
             unless itinerary.legs.nil?
@@ -246,11 +244,8 @@ module Api
               puts Time.now - legs_stuff_start
               total_legs_stuff += (Time.now - legs_stuff_start)
             end
-
             final_itineraries.append(i_hash)
-
           end
-
         end
 
         puts 'Total Legs Stuff ######################'
@@ -282,7 +277,7 @@ module Api
         puts Time.now - start
         render json: {trip_id: trip.id, origin_in_callnride: origin_in_callnride, origin_callnride: origin_callnride, destination_in_callnride: destination_in_callnride, destination_callnride: destination_callnride, trip_token: trip.token, modes: modes, itineraries: final_itineraries}
 
-        #start = Time.now
+        start = Time.now
         #trip.save
         #from_trip_place.save
         #to_trip_place.save
@@ -308,7 +303,6 @@ module Api
         booking_request.each do |itinerary_hash|
           itinerary = Itinerary.find(itinerary_hash[:itinerary_id].to_i)
 
-          puts 'viewing itinerary'
           puts itinerary.ai
 
           ecolane_booking = EcolaneBooking.where(itinerary: itinerary).first_or_create
