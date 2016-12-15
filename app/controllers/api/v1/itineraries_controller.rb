@@ -276,10 +276,14 @@ module Api
 
         start = Time.now
         trip.save
+        tp.trip = trip
         tp.save
         from_trip_place.save
         to_trip_place.save
-        my_itins.each { |itin| itin.save }
+        my_itins.each do |itin|
+          itin.trip_part = tp
+          itin.save
+        end
         puts 'Saving ###'
         puts Time.now - start
 
