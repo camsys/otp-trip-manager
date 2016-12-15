@@ -173,7 +173,7 @@ class TripPart < ActiveRecord::Base
   # before this method is called.
   def create_itineraries(params)
 
-    response = nil
+    transit_response = nil
     Rails.logger.info "CREATE: " + params[:modes].collect {|m| m.code}.join(",")
     # remove_existing_itineraries
     itins = []
@@ -210,6 +210,11 @@ class TripPart < ActiveRecord::Base
             start = Time.now
             new_itins, response = create_fixed_route_itineraries({otp_mode: mode.otp_mode, mode: mode.code, walk_mph: params[:walk_speed], max_walk_miles: params[:max_walk_miles], max_walk_seconds: params[:max_walk_seconds], optimize: params[:optimize], num_itineraries: params[:num_itineraries], min_transfer_time: params[:min_transfer_time], max_transfer_time: params[:max_transfer_time], banned_routes: params[:banned_routes], preferred_routes: params[:preferred_routes]})
 
+            if mode.code == "mode_transit"
+              puts 'in here'
+              transit_response = response
+            end
+
             puts 'CREATE FIXED_ ROUTE ITINERARIES ###'
             puts Time.now - start
             non_duplicate_itins = []
@@ -227,10 +232,8 @@ class TripPart < ActiveRecord::Base
         end
       end
     end
-    Rails.logger.info('Adding NEW ITINERARIES TO THIS TRIP PART')
-    Rails.logger.info(itins.inspect)
     #self.itineraries << itins
-    return itins, response
+    return itins, transit_response
   end
 
   def check_for_duplicates(new_i, existing_itins)
@@ -301,16 +304,6 @@ class TripPart < ActiveRecord::Base
 
     start = Time.now
 
-    puts 'PARAMS[:MODE'
-    puts params[:mode]
-
-    #If this is a transit trip, save the response
-    if params[:mode].to_s == "mode_transit"
-      transit_response = response
-      #puts 'Saving trip part'
-      #benchmark { self.save }
-    end
-
     puts 'SAVE THE OTP RESPONSE ###'
     puts Time.now - start
 
@@ -368,7 +361,7 @@ class TripPart < ActiveRecord::Base
 
     end
 
-    return itins, transit_response
+    return itins, response
 
   end
 
