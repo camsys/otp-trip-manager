@@ -37,7 +37,7 @@ module Api
         itins_loop_start = nil
         start_phase_1 = Time.now
 
-
+        my_itins = []
 
         #Unpack params
         modes = params['modes'] || ['mode_transit']
@@ -98,6 +98,7 @@ module Api
         start_phase_2 = nil
 
         #Build the trip_parts (i.e., segments)
+        tp = nil
         trip_parts.each do |trip_part|
           # Create the outbound trip part
           tp = TripPart.new
@@ -161,7 +162,7 @@ module Api
           end
 
 
-          puts 'Phase 1 ###########################################################################################################'
+          puts 'Phase 1 ###'
           puts Time.now - start_phase_1
           start_phase_2 = Time.now
 
@@ -171,13 +172,10 @@ module Api
 
           start = Time.now
           itins, otp_response = tp.create_itineraries({modes: trip.desired_modes, walk_speed: walk_mph, max_walk_miles: max_walk_miles, max_walk_seconds: max_walk_seconds, optimize: optimize, num_itineraries: trip.num_itineraries, min_transfer_time: min_transfer_time, max_transfer_time: max_transfer_time, banned_routes: banned_routes, preferred_routes: preferred_routes})
-          puts 'Create Itineraries #######################################################################################################'
+          puts 'Create Itineraries ###'
           puts Time.now - start
 
           my_itins = itins
-          #benchmark { my_itins = Itinerary.where(trip_part: tp).order('created_at') }
-          #my_itins = tp.itineraries
-
           Rails.logger.info('Trip part ' + tp.id.to_s + ' generated ' + tp.itineraries.count.to_s + ' itineraries')
           Rails.logger.info(tp.itineraries.inspect)
           #Append data for API
@@ -240,7 +238,7 @@ module Api
               itinerary.legs = yaml_legs.to_yaml
               puts "itinerary.save"
               #benchmark { itinerary.save }
-              puts 'Legs Stuff #########################################################'
+              puts 'Legs ###'
               puts Time.now - legs_stuff_start
               total_legs_stuff += (Time.now - legs_stuff_start)
             end
@@ -248,13 +246,13 @@ module Api
           end
         end
 
-        puts 'Total Legs Stuff ######################'
+        puts 'Total Legs Stuff ###'
         puts total_legs_stuff
 
-        puts 'Itins Loop  #######################################################################################################'
+        puts 'Itins Loop  ###'
         puts Time.now - itins_loop_start
 
-        puts 'Phase 2 ###########################################################################################################'
+        puts 'Phase 2 ###'
         puts Time.now - start_phase_2
         start_phase_3 = Time.now
 
@@ -265,29 +263,29 @@ module Api
         origin_callnride = nil
         start = Time.now
         benchmark { origin_in_callnride, origin_callnride = from_trip_place.within_callnride? }
-        puts 'Checking to see if destination is in a CallNRide Zone'
-        puts 'Checking to see if destination is in a CallNRide##################################################################'
+        puts 'Checking to see if origin is in a CallNRide ###'
         puts Time.now - start
         destination_in_callnride = nil
         destination_callnride = nil
 
         start = Time.now
         benchmark { destination_in_callnride, destination_callnride = to_trip_place.within_callnride? }
-        puts 'Checking to see if destination is in a CallNRide##################################################################'
+        puts 'Checking to see if destination is in a CallNRide ###'
         puts Time.now - start
-        render json: {trip_id: trip.id, origin_in_callnride: origin_in_callnride, origin_callnride: origin_callnride, destination_in_callnride: destination_in_callnride, destination_callnride: destination_callnride, trip_token: trip.token, modes: modes, itineraries: final_itineraries}
+
 
         start = Time.now
-        #trip.save
-        #from_trip_place.save
-        #to_trip_place.save
-        puts 'FINAL SAVE BEFORE SENDING #######################################################################################################'
+        trip.save
+        tp.save
+        from_trip_place.save
+        to_trip_place.save
+        my_itins.each { |itin| itin.save }
+        puts 'Saving ###'
         puts Time.now - start
-        puts 'Phase 3 ###########################################################################################################'
-        puts Time.now - start_phase_3
 
-        puts 'TOTAL TIME ###########################################################################################################'
+        puts 'TOTAL TIME ###'
         puts Time.now - ultimate_start
+        render json: {trip_id: trip.id, origin_in_callnride: origin_in_callnride, origin_callnride: origin_callnride, destination_in_callnride: destination_in_callnride, destination_callnride: destination_callnride, trip_token: trip.token, modes: modes, itineraries: final_itineraries}
 
       end
 
@@ -295,7 +293,6 @@ module Api
 
         puts 'Viewing Booking Params'
         puts params.ai
-
 
         booking_request = params[:booking_request]
         booked_itineraries = []

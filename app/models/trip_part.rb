@@ -209,7 +209,7 @@ class TripPart < ActiveRecord::Base
           timed "fixed" do
             start = Time.now
             new_itins, response = create_fixed_route_itineraries({otp_mode: mode.otp_mode, mode: mode.code, walk_mph: params[:walk_mph], max_walk_miles: params[:max_walk_miles], max_walk_seconds: params[:max_walk_seconds], optimize: params[:optimize], num_itineraries: params[:num_itineraries], min_transfer_time: params[:min_transfer_time], max_transfer_time: params[:max_transfer_time], banned_routes: params[:banned_routes], preferred_routes: params[:preferred_routes]})
-            puts 'CREATE FIXED_ ROUTE ITINERARIES ###########################################################################################################'
+            puts 'CREATE FIXED_ ROUTE ITINERARIES ###'
             puts Time.now - start
             non_duplicate_itins = []
             start = Time.now
@@ -218,7 +218,7 @@ class TripPart < ActiveRecord::Base
                 non_duplicate_itins << itin
               end
             end
-            puts 'Check for DOOPS ###########################################################################################################'
+            puts 'Check for Duplicates ###'
             puts Time.now - start
 
             itins += non_duplicate_itins
@@ -257,7 +257,6 @@ class TripPart < ActiveRecord::Base
   def create_fixed_route_itineraries(params)
     transit_response = nil
 
-    start = Time.now
     itins = []
     tp = TripPlanner.new
     arrive_by = !is_depart
@@ -286,9 +285,6 @@ class TripPart < ActiveRecord::Base
         max_walk_distance = (params[:max_walk_seconds].to_f * (1.0/3600.0) * walk_speed.to_f)
       end
     end
-    puts 'START STUFF ###########################################################################################################'
-    puts Time.now - start
-
 
     puts 'Calling OTP:'
     result = nil
@@ -298,7 +294,7 @@ class TripPart < ActiveRecord::Base
     puts params.ai
 
     benchmark { result, response = tp.get_fixed_itineraries([from_trip_place.location.first, from_trip_place.location.last],[to_trip_place.location.first, to_trip_place.location.last], trip_time, arrive_by.to_s, params[:otp_mode], wheelchair, walk_speed, max_walk_distance, params[:max_bike_miles], params[:optimize], params[:num_itineraries], params[:min_transfer_time], params[:max_transfer_time], params[:banned_routes], params[:preferred_routes]) }
-    puts 'ACTUAL OTP CALL ###########################################################################################################'
+    puts 'ACTUAL OTP CALL ###'
     puts Time.now - start
 
 
@@ -311,7 +307,7 @@ class TripPart < ActiveRecord::Base
       #benchmark { self.save }
     end
 
-    puts 'SAVE THE OTP RESPONSE ###########################################################################################################'
+    puts 'SAVE THE OTP RESPONSE ###'
     puts Time.now - start
 
     #TODO: Save errored results to an event log
@@ -332,7 +328,7 @@ class TripPart < ActiveRecord::Base
 
       end
 
-      puts 'Convert itineraries ###########################################################################################################'
+      puts 'Convert itineraries ###'
       puts Time.now - start
     elsif response['error']
       itinerary = Itinerary.create(server_status: response['error']['id'], server_message: response['error']['msg'])
@@ -367,17 +363,6 @@ class TripPart < ActiveRecord::Base
       itins << itinerary
 
     end
-
-    start = Time.now
-    #Filter impractical routes
-    #if mode == 'TRANSIT,WALK' and result
-    ##  itins = check_for_long_walks(itins)
-    #elsif (mode == 'CAR,TRANSIT,WALK' or mode == 'CAR_PARK,TRANSIT,WALK') and result
-    #  itins = check_for_short_drives(itins)
-    #end
-
-    puts 'Other Checking ###########################################################################################################'
-    puts Time.now - start
 
     return itins, transit_response
 
