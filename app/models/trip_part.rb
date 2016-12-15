@@ -333,7 +333,7 @@ class TripPart < ActiveRecord::Base
     elsif response['error']
       itinerary = Itinerary.create(server_status: response['error']['id'], server_message: response['error']['msg'])
 
-      case mode_code.to_s
+      case params[:mode_code].to_s
         when 'mode_car'
           itinerary.mode = Mode.car
         when 'mode_bicycle'
@@ -349,7 +349,7 @@ class TripPart < ActiveRecord::Base
     elsif !response['plan']['id'].blank?
       itinerary = Itinerary.create(server_status: response['plan']['id'], server_message: response['plan']['msg'])
 
-      case mode_code.to_s
+      case params[:mode_code].to_s
         when 'mode_car'
           itinerary.mode = Mode.car
         when 'mode_bicycle'
