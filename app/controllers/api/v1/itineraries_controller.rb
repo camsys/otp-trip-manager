@@ -74,8 +74,6 @@ module Api
         trip.min_transfer_time = min_transfer_time.nil? ? nil : min_transfer_time.to_i
         trip.max_transfer_time = max_transfer_time.nil? ? nil : max_transfer_time.to_i
         trip.source_tag = source_tag
-        puts "trip.save"
-        #benchmark { trip.save }
 
         #Build the Trip Places
         from_trip_place = TripPlace.new
@@ -89,9 +87,9 @@ module Api
         from_trip_place.from_place_details first_part[:start_location]
         to_trip_place.from_place_details first_part[:end_location]
         puts "from_trip_place.save"
-        #benchmark { from_trip_place.save }
+        benchmark { from_trip_place.save }
         puts "to_trip_place.save"
-        #benchmark { to_trip_place.save }
+        benchmark { to_trip_place.save }
 
         final_itineraries = []
 
@@ -161,10 +159,11 @@ module Api
           if tp.sequence == 0
             trip.scheduled_date = tp.scheduled_date
             trip.scheduled_time = tp.scheduled_time
-            puts "trip.save (2)"
-            #benchmark { trip.save }
           end
 
+          trip.save
+          tp.trip = trip
+          tp.save
 
           puts 'Phase 1 ###'
           puts Time.now - start_phase_1
@@ -241,7 +240,9 @@ module Api
               end
               itinerary.legs = yaml_legs.to_yaml
               puts "itinerary.save"
-              #benchmark { itinerary.save }
+              itinerary.trip_part = tp
+              benchmark { itinerary.save }
+              i_hash[:id]=itinerary.id
               puts 'Legs ###'
               puts Time.now - legs_stuff_start
               total_legs_stuff += (Time.now - legs_stuff_start)
@@ -275,20 +276,6 @@ module Api
         start = Time.now
         benchmark { destination_in_callnride, destination_callnride = to_trip_place.within_callnride? }
         puts 'Checking to see if destination is in a CallNRide ###'
-        puts Time.now - start
-
-
-        start = Time.now
-        trip.save
-        tp.trip = trip
-        tp.save
-        from_trip_place.save
-        to_trip_place.save
-        my_itins.each do |itin|
-          itin.trip_part = tp
-          itin.save
-        end
-        puts 'Saving ###'
         puts Time.now - start
 
         puts 'TOTAL TIME ###'
