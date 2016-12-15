@@ -197,7 +197,7 @@ module Api
               puts 'Load itinerary legs'
               yaml_legs = nil
               benchmark { yaml_legs = YAML.load(itinerary.legs) }
-              i_hash[:json_legs] = yaml_legs
+
               legs_stuff_start = Time.now
               yaml_legs.each do |leg|
 
@@ -222,28 +222,28 @@ module Api
 
 
                   trip_time = tp.get_trip_time leg['tripId'], otp_response
-                  unless trip_time.blank?
-
-                    puts '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
-                    stop_times = trip_time['stopTimes']
-                    if stop_times.first and stop_times.first['realtimeState'] == 'SCHEDULED'
-                      break
-                    end
-                    puts '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
-
-                    leg['intermediateStops'].each do |stop|
-                      stop_time = stop_times.detect{|hash| hash['stopId'] == stop['stopId']}
-                      stop['realtimeArrival'] = stop_time['realtimeArrival']
-                      stop['realtimeDeparture'] = stop_time['realtimeDeparture']
-                      stop['arrivalDelay'] = stop_time['arrivalDelay']
-                      stop['departureDelay'] = stop_time['departureDelay']
-                      stop['realtime'] = stop_time['realtime']
-                      stop['TESTTEST'] = "TEST"
-
-                    end
+                  if trip_time.blank?
+                    break
                   end
-                end
+                  stop_times = trip_time['stopTimes']
+                  puts stop_times.first['realtimeState']
+                  #if stop_times.first and stop_times.first['realtimeState'] == 'SCHEDULED'
+                  #  break
+                  #end
+                  puts '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
 
+                  leg['intermediateStops'].each do |stop|
+                    stop_time = stop_times.detect{|hash| hash['stopId'] == stop['stopId']}
+                    stop['realtimeArrival'] = stop_time['realtimeArrival']
+                    stop['realtimeDeparture'] = stop_time['realtimeDeparture']
+                    stop['arrivalDelay'] = stop_time['arrivalDelay']
+                    stop['departureDelay'] = stop_time['departureDelay']
+                    stop['realtime'] = stop_time['realtime']
+                    stop['TESTTEST'] = "TEST"
+
+                  end
+
+                end
 
                 #4 If a location is a ParkNRide Denote it
                 if leg['mode'] == 'CAR' and itinerary.returned_mode_code == Mode.park_transit.code
@@ -251,6 +251,7 @@ module Api
                 end
 
               end
+              i_hash[:json_legs] = yaml_legs
               itinerary.legs = yaml_legs.to_yaml
               puts "itinerary.save"
               itinerary.trip_part = tp
