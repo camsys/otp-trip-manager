@@ -123,8 +123,8 @@ module Api
           first_feed_id = Oneclick::Application.config.first_feed_id || TripPlanner.new.get_first_feed_id
 
           #Set Banned Routes
+          banned_routes_string = ""
           unless banned_routes.blank?
-            banned_routes_string = ""
             banned_routes.each do |banned_route|
               if banned_route['id'].blank?
                 banned_routes_string +=  first_feed_id.to_s + '_' + banned_route['short_name'] + ','
@@ -132,7 +132,8 @@ module Api
                 banned_routes_string += banned_route['id'].split(':').first + '_' + banned_route['short_name'] + ','
               end
             end
-            tp.banned_routes = banned_routes_string.chop
+            banned_routes_string = banned_routes_string.chop
+            tp.banned_routes = banned_routes_string
           end
 
           #Set Preferred Routes
@@ -171,7 +172,7 @@ module Api
           puts 'Creating Itineraries'
 
           start = Time.now
-          itins, otp_response = tp.create_itineraries({modes: trip.desired_modes, walk_speed: walk_mph, max_walk_miles: max_walk_miles, max_walk_seconds: max_walk_seconds, optimize: optimize, num_itineraries: trip.num_itineraries, min_transfer_time: min_transfer_time, max_transfer_time: max_transfer_time, banned_routes: banned_routes, preferred_routes: preferred_routes})
+          itins, otp_response = tp.create_itineraries({modes: trip.desired_modes, walk_speed: walk_mph, max_walk_miles: max_walk_miles, max_walk_seconds: max_walk_seconds, optimize: optimize, num_itineraries: trip.num_itineraries, min_transfer_time: min_transfer_time, max_transfer_time: max_transfer_time, banned_routes: banned_routes_string, preferred_routes: preferred_routes})
           puts 'Create Itineraries ###'
           puts Time.now - start
 
