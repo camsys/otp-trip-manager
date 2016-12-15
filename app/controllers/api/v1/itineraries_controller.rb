@@ -48,7 +48,7 @@ module Api
         max_walk_miles = params[:max_walk_miles]
         max_bike_miles = params[:max_bicycle_miles] # Miles
         max_walk_seconds = params[:max_walk_seconds] # Seconds
-        walk_mph = params[:walk_mph] || (@traveler.walking_speed ? @traveler.walking_speed.value : 3.0)
+        walk_mph = params[:walk_mph] || 3
         min_transfer_time = params[:min_transfer_time]
         max_transfer_time = params[:max_transfer_time]
         banned_routes = params[:banned_routes]
@@ -75,13 +75,13 @@ module Api
         trip.max_transfer_time = max_transfer_time.nil? ? nil : max_transfer_time.to_i
         trip.source_tag = source_tag
         puts "trip.save"
-        benchmark { trip.save }
+        #benchmark { trip.save }
 
         #Build the Trip Places
         from_trip_place = TripPlace.new
         to_trip_place = TripPlace.new
-        from_trip_place.trip = trip
-        to_trip_place.trip = trip
+        #from_trip_place.trip = trip
+        #to_trip_place.trip = trip
         from_trip_place.sequence = 0
         to_trip_place.sequence = 1
 
@@ -101,7 +101,7 @@ module Api
         trip_parts.each do |trip_part|
           # Create the outbound trip part
           tp = TripPart.new
-          tp.trip = trip
+          #tp.trip = trip
 
           tp.sequence = trip_part[:segment_index]
           tp.is_depart = (trip_part[:departure_type].downcase == 'depart')
@@ -170,7 +170,7 @@ module Api
           puts 'Creating Itineraries'
 
           start = Time.now
-          itins, otp_response = tp.create_itineraries
+          itins, otp_response = tp.create_itineraries({modes: trip.desired_modes, walk_speed: walk_mph, max_walk_miles: max_walk_miles, max_walk_seconds: max_walk_seconds, optimize: optimize, num_itineraries: trip.num_itineraries, min_transfer_time: min_transfer_time, max_transfer_time: max_transfer_time, banned_routes: banned_routes, preferred_routes: preferred_routes})
           puts 'Create Itineraries #######################################################################################################'
           puts Time.now - start
 
@@ -188,19 +188,9 @@ module Api
             mode = itinerary.mode
             i_hash[:mode] = {name: TranslationEngine.translate_text(mode.name), code: mode.code}
             i_hash[:segment_index] = tp.sequence
-            i_hash[:start_location] = trip.origin.build_place_details_hash
-            i_hash[:end_location] = trip.destination.build_place_details_hash
+            i_hash[:start_location] = from_trip_place.build_place_details_hash
+            i_hash[:end_location] = to_trip_place.build_place_details_hash
             i_hash[:prebooking_questions] = itinerary.prebooking_questions
-            if itinerary.service
-              i_hash[:service_name] = itinerary.service.name
-            else
-              i_hash[:service_name] = ""
-            end
-
-            if itinerary.discounts
-              i_hash[:discounts] = JSON.parse(itinerary.discounts)
-            end
-
 
             #Open up the legs returned by OTP and augment the information
             unless itinerary.legs.nil?
@@ -251,7 +241,7 @@ module Api
               end
               itinerary.legs = yaml_legs.to_yaml
               puts "itinerary.save"
-              benchmark { itinerary.save }
+              #benchmark { itinerary.save }
               puts 'Legs Stuff #########################################################'
               puts Time.now - legs_stuff_start
               total_legs_stuff += (Time.now - legs_stuff_start)
@@ -290,12 +280,12 @@ module Api
         benchmark { destination_in_callnride, destination_callnride = to_trip_place.within_callnride? }
         puts 'Checking to see if destination is in a CallNRide##################################################################'
         puts Time.now - start
-        render json: {trip_id: trip.id, origin_in_callnride: origin_in_callnride, origin_callnride: origin_callnride, destination_in_callnride: destination_in_callnride, destination_callnride: destination_callnride, trip_token: trip.token, modes: trip.desired_modes_raw, itineraries: final_itineraries}
+        render json: {trip_id: trip.id, origin_in_callnride: origin_in_callnride, origin_callnride: origin_callnride, destination_in_callnride: destination_in_callnride, destination_callnride: destination_callnride, trip_token: trip.token, modes: modes, itineraries: final_itineraries}
 
-        start = Time.now
-        trip.save
-        from_trip_place.save
-        to_trip_place.save
+        #start = Time.now
+        #trip.save
+        #from_trip_place.save
+        #to_trip_place.save
         puts 'FINAL SAVE BEFORE SENDING #######################################################################################################'
         puts Time.now - start
         puts 'Phase 3 ###########################################################################################################'
