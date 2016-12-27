@@ -17,13 +17,14 @@ class ItineraryParser
         leg_itin = parse_leg(leg, include_geometry)
 
         if self.same_block? itin.last, leg_itin
+
           puts 'SAME BLOCK'
           puts itin.last.ai
           puts leg_itin.ai
           puts itin.ai
-          itin.pop
+          last = itin.pop
           puts itin.ai
-          itin << merge_legs(itin.last, leg_itin)
+          itin << merge_legs(last, leg_itin)
           puts itin.ai
           next
         else
