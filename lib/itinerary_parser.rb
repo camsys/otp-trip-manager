@@ -16,14 +16,16 @@ class ItineraryParser
       legs.each do |leg|
         leg_itin = parse_leg(leg, include_geometry)
 
-        Rails.logger.debug leg_itin.inspect
-
-        #puts leg.ai
-
         if self.same_block? itin.last, leg_itin
+          puts 'SAME BLOCK'
+          puts itin.last.ai
+          puts leg_itin.ai
+
           itin.pop
           itin << merge_legs(itin.last, leg_itin)
           next
+        else
+          puts 'NOT THE SAME'
         end
 
         itin << leg_itin unless leg_itin.nil?
