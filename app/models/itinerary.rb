@@ -439,6 +439,10 @@ class Itinerary < ActiveRecord::Base
     merged_leg["distance"] = leg1["distance"] + leg2["distance"]
     merged_leg["to"] = leg2["to"]
     merged_leg["intermediateStops"] = leg1["intermediateStops"] + [leg2["from"]] + leg2["intermediateStops"]
+    legGeometry = {}
+    legGeometry["length"] = leg1["legGeometry"]["length"] + leg2["legGeometry"]["length"]
+    legGeometry["points"] = Polylines::Encoder.encode_points(Polylines::Decoder.decode_polyline(leg1["legGeometry"]["points"]) + Polylines::Decoder.decode_polyline(leg2["legGeometry"]["points"]))
+    merged_leg["legGeometry"] = legGeometry
     return merged_leg
   end
 
