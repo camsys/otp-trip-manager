@@ -34,6 +34,9 @@ class ItineraryParser
       end
     end
 
+    puts "Returning"
+    puts itin.ai
+
     return itin
 
   end
