@@ -20,14 +20,16 @@ class ItineraryParser
           puts 'SAME BLOCK'
           puts itin.last.ai
           puts leg_itin.ai
-
+          puts itin.ai
           itin.pop
+          puts itin.ai
           itin << merge_legs(itin.last, leg_itin)
+          puts itin.ai
           next
         else
           puts 'NOT THE SAME'
         end
-
+        puts 'here'
         itin << leg_itin unless leg_itin.nil?
       end
     end
