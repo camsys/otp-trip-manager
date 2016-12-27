@@ -200,7 +200,7 @@ module Api
               puts 'MERGING LEGS'
               start_merging = Time.now
               yaml_legs = itinerary.merged_legs
-              puts 'Done Merging Legs ###################'
+              puts 'Done Merging Legs ###'
               puts Time.now - start_merging
 
               legs_stuff_start = Time.now
