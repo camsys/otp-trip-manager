@@ -197,7 +197,11 @@ module Api
               puts 'Load itinerary legs'
               yaml_legs = nil
               #benchmark { yaml_legs = YAML.load(itinerary.legs) }
-              benchmark { yaml_legs = itinerary.merged_legs }
+              puts 'MERGING LEGS'
+              start_merging = Time.now
+              yaml_legs = itinerary.merged_legs
+              puts 'Done Merging Legs ###################'
+              puts Time.now - start_merging
 
               legs_stuff_start = Time.now
               yaml_legs.each do |leg|

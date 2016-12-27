@@ -412,13 +412,9 @@ class Itinerary < ActiveRecord::Base
   #Return legs, but merge consecutive legs that have the same block id into a single leg
   def merged_legs
 
-    puts 'BEFORE'
-
     if self.legs.nil?
       return []
     end
-
-
 
     legs = YAML.load(self.legs)
     puts legs.count
@@ -433,20 +429,26 @@ class Itinerary < ActiveRecord::Base
         itin << leg unless leg.nil?
       end
     end
-    puts 'After'
-    puts itin.count
     return itin
   end
 
 
   def merge_legs leg1, leg2
-    return leg1
+    merged_leg = leg1
+    merged_leg["endTime"] = leg2["endTime"]
+    merged_leg["distance"] = leg1["distance"] + leg2["distance"]
+    merged_leg["to"] = leg2["to"]
+    merged_leg["intermediateStops"] = leg1["intermediateStops"] + [leg2["from"]] + leg2["intermediateStops"]
+    return merged_leg
   end
 
   def same_block? leg1, leg2
     if leg1.nil? or leg2.nil?
       return false
     end
+
+    puts leg1["tripBlockId"]
+    puts leg2["tripBlockId"]
 
     if leg1["tripBlockId"].blank? or leg2["tripBlockId"].blank?
       return false
