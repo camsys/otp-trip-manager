@@ -170,7 +170,7 @@ class UserMailer < ActionMailer::Base
   private
 
   def add_logo_attachment
-    url = ActionController::Base.helpers.asset_path(Oneclick::Application.config.ui_logo)
+    url = "public/" + ActionController::Base.helpers.asset_path(Oneclick::Application.config.ui_logo)
     attachments.inline['header_logo.png'] = open(url, 'rb').read
   end
 
