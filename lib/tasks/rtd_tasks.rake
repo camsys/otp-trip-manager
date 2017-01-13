@@ -5,6 +5,8 @@ namespace :oneclick do
   task :load_new_landmarks => :environment do
 
     require 'open-uri'
+    OpenURI::Buffer.send :remove_const, 'StringMax'
+    OpenURI::Buffer.const_set 'StringMax', 0
     include TripsSupport
 
     begin
@@ -276,6 +278,8 @@ namespace :oneclick do
   desc "Update Synonyms for Shortcuts"
   task :update_synonyms => :environment do
     require 'open-uri'
+    OpenURI::Buffer.send :remove_const, 'StringMax'
+    OpenURI::Buffer.const_set 'StringMax', 0
 
     begin
       sm = Oneclick::Application.config.synonyms_file
