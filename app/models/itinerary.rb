@@ -458,7 +458,7 @@ class Itinerary < ActiveRecord::Base
       return false
     end
 
-    if leg1["tripBlockId"] == leg2["tripBlockId"]
+    if leg1["tripBlockId"] == leg2["tripBlockId"] and leg1["routeId"] == leg2["routeId"]
       return true
     end
 
