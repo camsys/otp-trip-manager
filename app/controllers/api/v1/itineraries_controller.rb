@@ -49,7 +49,7 @@ module Api
         max_bike_miles = params[:max_bicycle_miles] # Miles
         max_walk_seconds = params[:max_walk_seconds] # Seconds
         walk_mph = params[:walk_mph] || 3
-        min_transfer_time = params[:min_transfer_time]
+        min_transfer_time = params[:min_transfer_time_hard]
         max_transfer_time = params[:max_transfer_time]
         banned_routes = params[:banned_routes]
         preferred_routes = params[:preferred_routes]

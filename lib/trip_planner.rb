@@ -68,7 +68,7 @@ class TripPlanner
     end
 
     unless min_transfer_time.nil? 
-      url_options += "&minTransferTime=" + min_transfer_time.to_s
+      url_options += "&minTransferTimeHard=" + min_transfer_time.to_s
     end
 
     unless max_transfer_time.nil?
